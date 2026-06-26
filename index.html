@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  IMAGE FILES — upload these 19 PNGs, with these EXACT filenames (case
+  sensitive), into an "images" folder placed right next to this index.html
+  in your GitHub repo:
+
+    repo-root/
+      index.html
+      images/
+        Cropping_Intensity.png        <- overview map (intensity section)
+
+        Aman_Crop_Area.png            <- Aman   : crop cover area (ha)
+        Aman_pct.png                  <- Aman   : % of district area
+        Aman_Yield.png                <- Aman   : yield (MT/ha)
+
+        Aus_Crop_Area.png             <- Aus    : crop cover area (ha)
+        Aus_pct.png                   <- Aus    : % of district area
+        Aus_Yield.png                 <- Aus    : yield (MT/ha)
+
+        Boro_Crop_Area.png            <- Boro   : crop cover area (ha)
+        Boro_pct.png                  <- Boro   : % of district area
+        Boro_Rice_Yield.png           <- Boro   : yield (MT/ha)
+
+        Wheat_Crop_Area.png           <- Wheat  : crop cover area (ha)
+        wheat_pct.png                 <- Wheat  : % of district area  (lowercase "w")
+        Wheat.png                     <- Wheat  : yield (MT/ha)
+
+        Rabi_Maize_Crop_Area.png      <- Maize  : crop cover area (ha)
+        Rabi_Maize_pct.png            <- Maize  : % of district area
+        Rabi_Maize_Yield.png          <- Maize  : yield (MT/ha)
+
+        Potato_Crop_Area.png          <- Potato : crop cover area (ha)
+        Potato_pct.png                <- Potato : % of district area
+        Potato_Yield.png              <- Potato : yield (MT/ha)
+
+  Every <img> below (and the CROPS data object near the bottom of the file)
+  points at "images/<name>.png" using exactly these names — drop the files
+  in and nothing else needs to change.
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapping the Harvest — Agricultural Thematic Maps of Bangladesh</title>
+<meta name="description" content="District-level thematic mapping of six major crops across Bangladesh — CEGIS, Exercise 02.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Fraunces:ital,opsz,wght@1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --ink:        #122019;
+  --ink-soft:   #2c3a32;
+  --paper:      #f1efe2;
+  --paper-dim:  #e8e4d2;
+  --paper-line: #d8d2bb;
+  --paddy:      #1f6f50;
+  --paddy-deep: #134a35;
+  --river:      #0e6e8c;
+  --river-deep: #0a4f64;
+  --gold:       #e0b03d;
+  --amber:      #d9792f;
+  --terracotta: #b6472b;
+  --olive:      #8aa63c;
+  --plum:       #6b4e8e;
+  --cream-card: #faf8ef;
+
+  --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono:  "JetBrains Mono", "SF Mono", Consolas, monospace;
+
+  --maxw: 1180px;
+  --rule: 1px solid var(--paper-line);
+}
+
+/* ramp used everywhere a 5-class (or 6-class) breakdown is shown */
+.ramp-0{ background:var(--plum); }      /* zero production */
+.ramp-1{ background:var(--paddy); }     /* very low */
+.ramp-2{ background:var(--olive); }     /* low */
+.ramp-3{ background:var(--gold); }      /* medium */
+.ramp-4{ background:var(--amber); }     /* high */
+.ramp-5{ background:var(--terracotta); }/* very high */
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+}
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+img{ max-width:100%; display:block; }
+a{ color:inherit; }
+::selection{ background:var(--gold); color:var(--ink); }
+
+h1,h2,h3,h4{ font-family:var(--serif); font-weight:600; margin:0; color:var(--ink); }
+
+.mono{ font-family:var(--mono); }
+.eyebrow{
+  font-family:var(--mono);
+  font-size:0.72rem;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--paddy-deep);
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.eyebrow::before{
+  content:"";
+  width:7px; height:7px;
+  border-radius:50%;
+  background:var(--terracotta);
+  display:inline-block;
+}
+
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:0 32px; }
+@media (max-width:640px){ .wrap{ padding:0 20px; } }
+
+.visually-hidden{ position:absolute; left:-9999px; }
+
+a:focus-visible, button:focus-visible{
+  outline:3px solid var(--river);
+  outline-offset:2px;
+}
+
+/* ============================================================
+   RIVER THREAD DIVIDER (signature motif — braided delta line)
+   ============================================================ */
+.river-divider{
+  width:100%;
+  height:46px;
+  display:block;
+  margin:0;
+}
+.river-divider svg{ width:100%; height:100%; display:block; }
+.river-divider path{ fill:none; stroke-linecap:round; }
+
+/* ============================================================
+   TOP NAV
+   ============================================================ */
+#topnav{
+  position:sticky; top:0; z-index:60;
+  background:rgba(241,239,226,0.92);
+  backdrop-filter:blur(8px);
+  border-bottom:var(--rule);
+}
+#progress-bar{
+  height:3px; width:0%;
+  background:linear-gradient(90deg,var(--paddy),var(--gold),var(--terracotta));
+  transition:width 0.1s linear;
+}
+.nav-inner{
+  max-width:var(--maxw); margin:0 auto; padding:0 32px;
+  display:flex; align-items:center; justify-content:space-between;
+  height:58px;
+}
+.nav-mark{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--mono); font-weight:600; font-size:0.82rem;
+  letter-spacing:0.04em; text-decoration:none; color:var(--ink);
+  white-space:nowrap;
+}
+.nav-mark .dot-grid{ display:flex; gap:2px; }
+.nav-mark .dot-grid span{ width:4px; height:4px; background:var(--paddy); display:block; }
+.nav-mark .dot-grid span:nth-child(2){ background:var(--gold); }
+.nav-mark .dot-grid span:nth-child(3){ background:var(--terracotta); }
+
+.nav-links{
+  display:flex; gap:22px; overflow-x:auto;
+  scrollbar-width:none; -ms-overflow-style:none;
+}
+.nav-links::-webkit-scrollbar{ display:none; }
+.nav-links a{
+  font-family:var(--mono); font-size:0.74rem; letter-spacing:0.06em;
+  text-transform:uppercase; text-decoration:none; color:var(--ink-soft);
+  white-space:nowrap; padding:4px 2px; border-bottom:2px solid transparent;
+  transition:color .15s, border-color .15s;
+}
+.nav-links a:hover, .nav-links a.active{ color:var(--paddy-deep); border-color:var(--terracotta); }
+
+@media (max-width:760px){
+  .nav-links{ display:none; }
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;
+  background:radial-gradient(ellipse at 18% -10%, #1c5c46 0%, var(--paddy-deep) 38%, var(--ink) 100%);
+  color:var(--paper);
+  overflow:hidden;
+  padding:88px 0 0;
+}
+.hero-rivers{ position:absolute; inset:0; opacity:0.4; pointer-events:none; }
+.hero-rivers svg{ width:100%; height:100%; }
+
+.hero-inner{
+  position:relative; z-index:2;
+  max-width:var(--maxw); margin:0 auto; padding:48px 32px 70px;
+}
+.hero-eyebrow{
+  font-family:var(--mono); font-size:0.74rem; letter-spacing:0.16em;
+  text-transform:uppercase; color:#cfe7d8;
+  display:flex; align-items:center; gap:10px; margin-bottom:26px;
+}
+.hero-eyebrow .line{ width:38px; height:1px; background:#cfe7d8; opacity:0.6; }
+
+.hero h1{
+  font-size:clamp(2.6rem, 6.4vw, 5.1rem);
+  line-height:1.02;
+  color:#fbf8ee;
+  max-width:14ch;
+  letter-spacing:-0.01em;
+}
+.hero h1 em{
+  font-style:italic; font-weight:500; color:var(--gold);
+}
+.hero-sub{
+  margin-top:24px; max-width:46ch;
+  font-size:1.08rem; color:#dbe6d9; line-height:1.65;
+}
+.hero-sub strong{ color:#fff; font-weight:600; }
+
+.stamp{
+  position:absolute; top:46px; right:34px; z-index:3;
+  width:128px; height:128px;
+  border:1.5px dashed rgba(224,176,61,0.65);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  transform:rotate(-9deg);
+}
+.stamp-inner{
+  font-family:var(--mono); font-size:0.6rem; letter-spacing:0.08em;
+  text-align:center; color:var(--gold); line-height:1.5;
+  text-transform:uppercase;
+}
+.stamp-inner b{ display:block; font-size:0.92rem; color:#fbf8ee; letter-spacing:0.02em; margin-bottom:2px;}
+@media (max-width:640px){ .stamp{ display:none; } }
+
+.hero-stats{
+  position:relative; z-index:2;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  border-top:1px solid rgba(241,239,226,0.18);
+}
+.hero-stats div{
+  padding:22px 32px;
+  border-right:1px solid rgba(241,239,226,0.18);
+}
+.hero-stats div:last-child{ border-right:none; }
+.hero-stats .num{
+  font-family:var(--serif); font-weight:600; font-size:1.9rem; color:#fbf8ee;
+}
+.hero-stats .lbl{
+  font-family:var(--mono); font-size:0.68rem; letter-spacing:0.08em;
+  text-transform:uppercase; color:#a9c9b8; margin-top:4px;
+}
+@media (max-width:760px){
+  .hero-stats{ grid-template-columns:repeat(2,1fr); }
+  .hero-stats div:nth-child(2){ border-right:none; }
+}
+
+/* ============================================================
+   GENERIC SECTION SHELL
+   ============================================================ */
+section.block{ padding:84px 0; }
+section.block.tight{ padding-top:52px; }
+.section-head{ max-width:680px; margin-bottom:48px; }
+.section-head h2{ font-size:clamp(1.8rem,3.4vw,2.6rem); margin-top:14px; }
+.section-head p{ margin-top:16px; color:var(--ink-soft); font-size:1.02rem; }
+
+.bg-deep{ background:var(--ink); color:var(--paper); }
+.bg-deep .section-head h2{ color:#fbf8ee; }
+.bg-deep .section-head p{ color:#cfd6cc; }
+.bg-card{ background:var(--paper-dim); }
+
+/* ============================================================
+   OVERVIEW: methodology spec sheet
+   ============================================================ */
+.spec-grid{
+  display:grid; grid-template-columns:1.1fr 0.9fr; gap:36px;
+}
+@media (max-width:860px){ .spec-grid{ grid-template-columns:1fr; } }
+
+.spec-card{
+  background:var(--cream-card);
+  border:var(--rule);
+  border-radius:2px;
+  padding:30px 32px;
+}
+.spec-card h3{ font-size:1.05rem; }
+.spec-card .eyebrow{ margin-bottom:10px; }
+.spec-table{ width:100%; border-collapse:collapse; margin-top:18px; font-size:0.86rem; }
+.spec-table td{ padding:7px 4px; border-bottom:1px dashed var(--paper-line); vertical-align:top; }
+.spec-table td:first-child{ color:var(--ink-soft); width:46%; }
+.spec-table td:last-child{ font-family:var(--mono); font-weight:500; text-align:right; }
+
+.param-pill-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+.param-pill{
+  font-family:var(--mono); font-size:0.7rem; letter-spacing:0.02em;
+  background:var(--paper-dim); border:1px solid var(--paper-line);
+  border-radius:20px; padding:5px 12px; color:var(--ink-soft);
+}
+
+.method-steps{ list-style:none; margin:18px 0 0; padding:0; counter-reset:step; }
+.method-steps li{
+  position:relative; padding:14px 0 14px 38px;
+  border-bottom:1px dashed var(--paper-line);
+  font-size:0.92rem; color:var(--ink-soft);
+}
+.method-steps li:last-child{ border-bottom:none; }
+.method-steps li::before{
+  counter-increment:step; content:counter(step);
+  position:absolute; left:0; top:13px;
+  width:24px; height:24px; border-radius:50%;
+  background:var(--paddy); color:#fff;
+  font-family:var(--mono); font-size:0.74rem; font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+}
+.method-steps li b{ color:var(--ink); display:block; font-family:var(--sans); font-weight:600; margin-bottom:2px;}
+
+/* parameter trio (yield / area / %area) explainer cards */
+.param-trio{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:48px; }
+@media (max-width:860px){ .param-trio{ grid-template-columns:1fr; } }
+.param-card{
+  background:var(--cream-card); border:var(--rule); padding:26px 24px;
+  position:relative;
+}
+.param-card .pc-icon{
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--serif); font-weight:600; color:#fff; font-size:1rem;
+  margin-bottom:14px;
+}
+.param-card:nth-child(1) .pc-icon{ background:var(--river); }
+.param-card:nth-child(2) .pc-icon{ background:var(--paddy); }
+.param-card:nth-child(3) .pc-icon{ background:var(--amber); }
+.param-card h4{ font-size:1.05rem; }
+.param-card p{ font-size:0.88rem; color:var(--ink-soft); margin-top:8px; }
+.param-card .formula{
+  margin-top:12px; font-family:var(--mono); font-size:0.72rem;
+  background:var(--paper-dim); padding:8px 10px; border-radius:4px; color:var(--ink-soft);
+}
+
+/* ============================================================
+   INTENSITY (context) SECTION — single hero map
+   ============================================================ */
+.intensity-layout{ display:grid; grid-template-columns:1.15fr 0.85fr; gap:40px; align-items:start; }
+@media (max-width:900px){ .intensity-layout{ grid-template-columns:1fr; } }
+
+.figure{
+  border:var(--rule); background:var(--cream-card);
+  overflow:hidden; cursor:zoom-in; position:relative;
+}
+.figure img{ width:100%; height:auto; display:block; transition:transform .5s ease; }
+.figure:hover img{ transform:scale(1.015); }
+.figure .figcap{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:11px 16px; font-family:var(--mono); font-size:0.7rem;
+  letter-spacing:0.04em; color:var(--ink-soft); border-top:var(--rule);
+  text-transform:uppercase;
+}
+.figure .figcap .zoom-hint{ color:var(--river); }
+
+.stat-quint{
+  display:grid; grid-template-columns:repeat(5,1fr); gap:1px;
+  background:var(--paper-line); margin-top:22px; border:1px solid var(--paper-line);
+}
+.stat-quint div{ background:var(--cream-card); padding:14px 10px; text-align:center; }
+.stat-quint .v{ font-family:var(--mono); font-weight:700; font-size:1.05rem; }
+.stat-quint .k{ font-family:var(--mono); font-size:0.62rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-top:3px; }
+@media (max-width:540px){ .stat-quint{ grid-template-columns:repeat(3,1fr); } }
+
+.classbar{ margin-top:26px; }
+.classbar .bar{ display:flex; width:100%; height:14px; border-radius:3px; overflow:hidden; }
+.classbar .bar span{ height:100%; }
+.classbar .legend{ display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; }
+.classbar .legend .item{ display:flex; align-items:center; gap:7px; font-size:0.78rem; color:var(--ink-soft); }
+.classbar .legend .sw{ width:10px; height:10px; border-radius:2px; flex:none; }
+.classbar .legend b{ color:var(--ink); font-family:var(--mono); }
+
+.side-card{
+  background:var(--ink); color:var(--paper);
+  padding:30px 28px; border-radius:2px;
+}
+.side-card .eyebrow{ color:#9fd3b4; }
+.side-card .eyebrow::before{ background:var(--gold); }
+.side-card h3{ color:#fbf8ee; font-size:1.2rem; margin-top:12px; }
+.side-card p{ color:#cfd6cc; font-size:0.92rem; margin-top:12px; }
+.side-card table{ width:100%; margin-top:18px; font-size:0.8rem; border-collapse:collapse; }
+.side-card table th{ text-align:left; font-family:var(--mono); font-size:0.65rem; text-transform:uppercase; letter-spacing:0.06em; color:#9fd3b4; padding-bottom:8px; border-bottom:1px solid rgba(241,239,226,0.2);}
+.side-card table td{ padding:9px 4px; border-bottom:1px solid rgba(241,239,226,0.12); color:#dde3da; vertical-align:top;}
+
+/* ============================================================
+   CROP SECTIONS (rendered by JS, share these classes)
+   ============================================================ */
+.crop-section{ padding:86px 0; border-top:var(--rule); }
+.crop-section:nth-of-type(even){ background:var(--paper-dim); }
+
+.crop-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:18px; margin-bottom:6px; }
+.crop-tag{
+  font-family:var(--mono); font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase;
+  padding:5px 11px; border-radius:20px; color:#fff; white-space:nowrap;
+}
+.crop-head h2{ font-size:clamp(1.9rem,4vw,3rem); }
+.crop-role{ max-width:64ch; color:var(--ink-soft); margin-top:10px; font-size:1rem; }
+
+.crop-meta-row{
+  display:flex; gap:28px; margin-top:22px; flex-wrap:wrap;
+}
+.crop-meta-row .mi{ font-size:0.82rem; }
+.crop-meta-row .mi .k{ font-family:var(--mono); text-transform:uppercase; letter-spacing:0.05em; font-size:0.66rem; color:var(--ink-soft); display:block; margin-bottom:3px;}
+.crop-meta-row .mi .v{ font-weight:600; }
+
+.map-gallery{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:22px;
+  margin-top:38px;
+}
+@media (max-width:980px){ .map-gallery{ grid-template-columns:1fr; } }
+
+.map-card .figcap b{ color:var(--ink); font-family:var(--sans); text-transform:none; font-weight:600; font-size:0.78rem;}
+
+.stat-panels{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:18px;
+}
+@media (max-width:980px){ .stat-panels{ grid-template-columns:1fr; } }
+
+.stat-panel{
+  background:var(--cream-card); border:var(--rule); padding:20px 22px;
+}
+.stat-panel .sp-head{ display:flex; justify-content:space-between; align-items:baseline; }
+.stat-panel .sp-head h4{ font-size:0.92rem; font-family:var(--sans); font-weight:700; }
+.stat-panel .sp-head span{ font-family:var(--mono); font-size:0.66rem; color:var(--ink-soft); text-transform:uppercase; }
+
+.sp-range{
+  display:flex; justify-content:space-between; margin-top:14px;
+  font-family:var(--mono); font-size:0.94rem; font-weight:600;
+}
+.sp-range .lo{ color:var(--paddy-deep); }
+.sp-range .hi{ color:var(--terracotta); }
+.sp-sub{ display:flex; gap:14px; margin-top:6px; font-family:var(--mono); font-size:0.68rem; color:var(--ink-soft); }
+
+.sp-bar{ display:flex; width:100%; height:10px; border-radius:3px; overflow:hidden; margin-top:14px; }
+.sp-bar span{ height:100%; }
+.sp-legend{ margin-top:10px; display:flex; flex-direction:column; gap:5px; }
+.sp-legend .row{ display:flex; justify-content:space-between; font-size:0.74rem; color:var(--ink-soft); }
+.sp-legend .row .lbl{ display:flex; align-items:center; gap:6px; }
+.sp-legend .row .sw{ width:8px; height:8px; border-radius:2px; flex:none; }
+.sp-legend .row b{ font-family:var(--mono); color:var(--ink); }
+
+.signature-row{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:32px;
+}
+@media (max-width:860px){ .signature-row{ grid-template-columns:1fr; } }
+.sig-card{ border-left:3px solid var(--paddy); padding:4px 0 4px 18px; }
+.sig-card.lag{ border-left-color:var(--terracotta); }
+.sig-card.pat{ border-left-color:var(--river); }
+.sig-card .eyebrow{ font-size:0.64rem; }
+.sig-card p{ margin-top:6px; font-size:0.88rem; color:var(--ink-soft); }
+.sig-card p b{ color:var(--ink); }
+
+.observation{
+  margin-top:36px; padding:26px 28px;
+  background:var(--ink); color:var(--paper);
+  position:relative; border-radius:2px;
+}
+.observation::before{
+  content:"“"; font-family:var(--serif); font-size:3.6rem; color:var(--gold);
+  position:absolute; top:-6px; left:18px; opacity:0.85; line-height:1;
+}
+.observation p{ position:relative; z-index:1; font-size:0.98rem; color:#e6e9e1; line-height:1.7; padding-left:8px; }
+.observation .att{ margin-top:10px; font-family:var(--mono); font-size:0.66rem; color:#9fd3b4; text-transform:uppercase; letter-spacing:0.06em; padding-left:8px; }
+
+/* ============================================================
+   SYNTHESIS / CONCLUSION
+   ============================================================ */
+.compare-chart{ margin-top:10px; }
+.compare-row{
+  display:grid; grid-template-columns:120px 1fr 70px; align-items:center;
+  gap:14px; padding:9px 0; border-bottom:1px dashed rgba(241,239,226,0.18);
+}
+.compare-row .cname{ font-family:var(--mono); font-size:0.78rem; font-weight:600; }
+.compare-row .ctrack{ display:flex; background:rgba(241,239,226,0.12); border-radius:3px; height:10px; overflow:hidden; }
+.compare-row .cfill{ display:block; height:100%; border-radius:3px; }
+.compare-row .cval{ font-family:var(--mono); font-size:0.78rem; text-align:right; color:#cfd6cc; }
+
+.takeaway-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:24px; margin-top:48px; }
+@media (max-width:860px){ .takeaway-grid{ grid-template-columns:1fr; } }
+.takeaway{ background:var(--cream-card); border:var(--rule); padding:26px 26px; }
+.takeaway .eyebrow{ margin-bottom:10px; }
+.takeaway h4{ font-size:1.08rem; }
+.takeaway p{ font-size:0.9rem; color:var(--ink-soft); margin-top:10px; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{ background:var(--ink); color:#cfd6cc; padding:54px 0 34px; }
+.foot-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:36px; }
+@media (max-width:760px){ .foot-grid{ grid-template-columns:1fr; gap:28px; } }
+footer h5{ font-family:var(--mono); font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:#9fd3b4; margin-bottom:14px; }
+footer p, footer li{ font-size:0.86rem; line-height:1.7; color:#cfd6cc; }
+footer ul{ list-style:none; margin:0; padding:0; }
+footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin-bottom:10px; }
+.foot-bottom{
+  margin-top:44px; padding-top:22px; border-top:1px solid rgba(241,239,226,0.15);
+  display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  font-family:var(--mono); font-size:0.68rem; color:#7c8a7f; letter-spacing:0.02em;
+}
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+#lightbox{
+  position:fixed; inset:0; background:rgba(10,16,12,0.92);
+  display:none; align-items:center; justify-content:center;
+  z-index:999; padding:40px;
+  backdrop-filter:blur(2px);
+}
+#lightbox.open{ display:flex; }
+#lightbox figure{ max-width:min(94vw,1400px); max-height:88vh; margin:0; text-align:center; }
+#lightbox img{ max-width:100%; max-height:78vh; margin:0 auto; box-shadow:0 30px 80px rgba(0,0,0,0.5); }
+#lightbox figcaption{
+  font-family:var(--mono); color:#cfe7d8; font-size:0.78rem; margin-top:16px; letter-spacing:0.03em;
+}
+#lightbox .lb-close{
+  position:absolute; top:24px; right:28px;
+  background:none; border:1px solid rgba(241,239,226,0.4); color:#f1efe2;
+  width:40px; height:40px; border-radius:50%; font-size:1.2rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+#lightbox .lb-close:hover{ background:rgba(241,239,226,0.12); }
+#lightbox .lb-down{
+  display:inline-block; margin-top:10px; font-family:var(--mono); font-size:0.7rem;
+  color:var(--gold); text-decoration:none; letter-spacing:0.04em; text-transform:uppercase;
+  border-bottom:1px solid var(--gold); padding-bottom:2px;
+}
+
+/* reveal-on-scroll */
+.reveal{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.in{ opacity:1; transform:none; }
+</style>
+</head>
+<body>
+
+<div id="topnav">
+  <div id="progress-bar"></div>
+  <div class="nav-inner">
+    <a href="#top" class="nav-mark">
+      <span class="dot-grid"><span></span><span></span><span></span></span>
+      CEGIS&nbsp;/&nbsp;RDT&nbsp;&middot;&nbsp;EX.02
+    </a>
+    <nav class="nav-links" id="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#intensity">Intensity</a>
+      <a href="#crop-boro">Boro</a>
+      <a href="#crop-aus">Aus</a>
+      <a href="#crop-aman">Aman</a>
+      <a href="#crop-wheat">Wheat</a>
+      <a href="#crop-maize">Maize</a>
+      <a href="#crop-potato">Potato</a>
+      <a href="#synthesis">Synthesis</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero" id="top">
+  <div class="hero-rivers" aria-hidden="true">
+    <svg viewBox="0 0 1200 520" preserveAspectRatio="none">
+      <path d="M -20 60 C 180 90, 220 20, 380 70 S 620 160, 700 110 S 900 30, 1220 90" stroke="#e0b03d" stroke-width="2" opacity="0.55"/>
+      <path d="M -20 160 C 160 200, 260 120, 420 175 S 660 260, 760 210 S 980 140, 1220 200" stroke="#cfe7d8" stroke-width="1.4" opacity="0.4"/>
+      <path d="M -20 320 C 220 360, 300 280, 470 330 S 720 410, 820 360 S 1020 300, 1220 350" stroke="#cfe7d8" stroke-width="1" opacity="0.3"/>
+      <path d="M -20 430 C 200 460, 320 400, 500 440 S 760 490, 880 450 S 1040 410, 1220 450" stroke="#e0b03d" stroke-width="1.4" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <div class="stamp" aria-hidden="true">
+    <div class="stamp-inner"><b>BTM</b>Everest 1830<br>CM 90.0&deg; &middot; SF 0.9996</div>
+  </div>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="line"></span> Exercise 02 &middot; District-Level Agricultural Mapping</div>
+    <h1>Mapping the<br><em>Harvest</em> of Bangladesh</h1>
+    <p class="hero-sub">Eighteen thematic maps, six major crops, sixty-four districts. A spatial reading of <strong>yield</strong>, <strong>cultivated area</strong>, and <strong>land commitment</strong> — built in ArcGIS&nbsp;Pro from boundary and crop-statistics data supplied by BBS, for the Research &amp; Development of Technology Division at CEGIS.</p>
+  </div>
+
+  <div class="hero-stats">
+    <div><div class="num">64</div><div class="lbl">Districts Mapped</div></div>
+    <div><div class="num">06</div><div class="lbl">Crops Analysed</div></div>
+    <div><div class="num">18+1</div><div class="lbl">Thematic Maps</div></div>
+    <div><div class="num">BTM</div><div class="lbl">Coordinate System</div></div>
+  </div>
+</header>
+
+<div class="river-divider" aria-hidden="true">
+  <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0 23 C 200 6, 280 40, 480 22 S 760 4, 900 24 S 1100 40, 1200 22" stroke="#0e6e8c" stroke-width="2" opacity="0.45"/></svg>
+</div>
+
+<main>
+
+  <!-- ============================================================ OVERVIEW ============================================================ -->
+  <section class="block" id="overview">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">01 &middot; Reading the maps</span>
+        <h2>Three lenses on every crop</h2>
+        <p>Bangladesh's 64 districts were processed through a shared pipeline: crop production and harvested-area figures from BBS, joined by <span class="mono">DISTCODE</span> to a district boundary shapefile, projected in <strong>Bangladesh Transverse Mercator</strong>. Each crop is read through three complementary parameters — no single one tells the whole story.</p>
+      </div>
+
+      <div class="param-trio reveal">
+        <div class="param-card">
+          <div class="pc-icon">Y</div>
+          <h4>Crop Yield</h4>
+          <p>How productively land is being used — independent of farm scale. A district can cultivate widely yet yield poorly, or farm a small area with excellent output.</p>
+          <div class="formula">MT/ha = Production (MT) &divide; Harvested Area (ha)</div>
+        </div>
+        <div class="param-card">
+          <div class="pc-icon">A</div>
+          <h4>Crop Area</h4>
+          <p>The absolute extent under cultivation, in hectares. This is the production geography — which districts anchor national supply by sheer scale.</p>
+          <div class="formula">Sourced directly from BBS crop statistics</div>
+        </div>
+        <div class="param-card">
+          <div class="pc-icon">%</div>
+          <h4>% of District Area</h4>
+          <p>Crop area normalised against total district size — revealing genuine land specialisation rather than an artefact of a district simply being large.</p>
+          <div class="formula">% = (Crop Area &divide; Total District Area) &times; 100</div>
+        </div>
+      </div>
+
+      <div class="spec-grid" style="margin-top:56px;">
+        <div class="spec-card reveal">
+          <span class="eyebrow">Processing pipeline</span>
+          <h3>From shapefile to symbology</h3>
+          <ol class="method-steps">
+            <li><b>Yield calculation</b>Crop production (MT) divided by harvested area (ha) for every district &times; crop combination.</li>
+            <li><b>Geometry &amp; area</b>District area computed with the ArcGIS Pro Geometry Calculator, exported to DBF, linked in Excel to derive % crop area.</li>
+            <li><b>Attribute join</b>Processed Excel tables joined to the district shapefile on <span class="mono">DISTCODE</span> via Add&nbsp;Join.</li>
+            <li><b>Graduated symbology</b>Equal-interval, five-class breaks applied per crop and parameter in ArcGIS Pro; charts built in Python (Matplotlib / Seaborn).</li>
+          </ol>
+        </div>
+        <div class="spec-card reveal">
+          <span class="eyebrow">Coordinate reference</span>
+          <h3>Bangladesh Transverse Mercator</h3>
+          <table class="spec-table">
+            <tr><td>Geographic datum</td><td>Everest 1830</td></tr>
+            <tr><td>Central meridian</td><td>90.0&deg;</td></tr>
+            <tr><td>Scale factor</td><td>0.9996</td></tr>
+            <tr><td>False easting</td><td>500,000 m</td></tr>
+            <tr><td>False northing</td><td>&minus;2,000,000 m</td></tr>
+            <tr><td>Semi-major axis</td><td>6,377,276.345 m</td></tr>
+            <tr><td>Inverse flattening</td><td>300.8017</td></tr>
+          </table>
+          <div class="param-pill-row">
+            <span class="param-pill">Define Projection &middot; ArcGIS Pro</span>
+            <span class="param-pill">Equal-interval &middot; 5 classes</span>
+            <span class="param-pill">Source &middot; BBS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="river-divider" aria-hidden="true">
+    <svg viewBox="0 0 1200 46" preserveAspectRatio="none"><path d="M0 30 C 220 10, 340 44, 540 26 S 820 6, 960 28 S 1140 42, 1200 26" stroke="#b6472b" stroke-width="1.6" opacity="0.35"/></svg>
+  </div>
+
+  <!-- ============================================================ CROPPING INTENSITY ============================================================ -->
+  <section class="block bg-card" id="intensity">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">02 &middot; Setting the baseline</span>
+        <h2>Cropping Intensity — the land's calendar</h2>
+        <p>Before reading any single crop, intensity sets the context: how many times a hectare is cultivated within one year. 100% is single cropping, 200% is double, and anything beyond reflects triple or mixed systems stacked onto the same land.</p>
+      </div>
+
+      <div class="intensity-layout">
+        <div class="reveal">
+          <div class="figure" data-lightbox="0">
+            <!-- upload as: images/Cropping_Intensity.png -->
+            <img src="images/Cropping_Intensity.png" alt="Cropping Intensity Distribution Map of Bangladesh, choropleth by district with histogram and donut breakdown" loading="lazy">
+            <div class="figcap"><span>Fig. 00 &middot; Cropping Intensity Distribution</span><span class="zoom-hint">Click to enlarge</span></div>
+          </div>
+
+          <div class="stat-quint">
+            <div><div class="v">140.25%</div><div class="k">Min</div></div>
+            <div><div class="v">278.40%</div><div class="k">Max</div></div>
+            <div><div class="v">198.06%</div><div class="k">Mean</div></div>
+            <div><div class="v">204.23%</div><div class="k">Median</div></div>
+            <div><div class="v">31.47</div><div class="k">Std&nbsp;Dev</div></div>
+          </div>
+
+          <div class="classbar">
+            <div class="bar">
+              <span class="ramp-1" style="width:23.1%"></span>
+              <span class="ramp-2" style="width:13.8%"></span>
+              <span class="ramp-3" style="width:33.8%"></span>
+              <span class="ramp-4" style="width:23.1%"></span>
+              <span class="ramp-5" style="width:6.2%"></span>
+            </div>
+            <div class="legend">
+              <div class="item"><span class="sw ramp-1"></span>Very Low 140&ndash;165% &middot; <b>15</b> (23.1%)</div>
+              <div class="item"><span class="sw ramp-2"></span>Low 165&ndash;190% &middot; <b>9</b> (13.8%)</div>
+              <div class="item"><span class="sw ramp-3"></span>Medium 190&ndash;215% &middot; <b>22</b> (33.8%)</div>
+              <div class="item"><span class="sw ramp-4"></span>High 215&ndash;240% &middot; <b>15</b> (23.1%)</div>
+              <div class="item"><span class="sw ramp-5"></span>Very High 240&ndash;280% &middot; <b>4</b> (6.2%)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-card reveal">
+          <span class="eyebrow">Why it varies</span>
+          <h3>One nation, two cropping worlds</h3>
+          <p>The 198% mean balances a productive northern belt consistently exceeding 215% against a structurally constrained southern and eastern periphery falling below 165% — not a uniform national condition.</p>
+          <table>
+            <tr><th>Factor</th><th>High intensity</th><th>Low intensity</th></tr>
+            <tr><td>Irrigation</td><td>Tubewell-fed Barind Tract enables dry-season Boro</td><td>No infrastructure &mdash; limited to one crop</td></tr>
+            <tr><td>Physiography</td><td>Flat floodplains, multiple cycles</td><td>Haor basins flood 6+ months; hill slopes block irrigation</td></tr>
+            <tr><td>Salinity</td><td>&mdash;</td><td>Coastal tidal backwater removes the dry-season window</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ CROP SECTIONS — rendered into here by script ============================================================ -->
+  <div id="crop-sections"></div>
+
+  <!-- ============================================================ SYNTHESIS ============================================================ -->
+  <section class="block bg-deep" id="synthesis">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">09 &middot; Putting it together</span>
+        <h2>The same map, six times over</h2>
+        <p>Read side by side, the eighteen maps describe one recurring geography: an irrigated, alluvial northwest that leads on nearly every parameter, and a hydrologically constrained south and east that consistently trails — not from poor management, but from terrain, salinity, and the monsoon itself.</p>
+      </div>
+
+      <div class="spec-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="spec-card reveal" style="background:#1b2a22; border-color:rgba(241,239,226,0.15);">
+          <span class="eyebrow" style="color:#9fd3b4;"><span style="display:none"></span>Mean yield by crop</span>
+          <h3 style="color:#fbf8ee;">National average yield (MT/ha)</h3>
+          <div class="compare-chart" id="yield-compare"></div>
+        </div>
+        <div class="spec-card reveal" style="background:#1b2a22; border-color:rgba(241,239,226,0.15);">
+          <span class="eyebrow" style="color:#9fd3b4;">Share of districts, Very Low class</span>
+          <h3 style="color:#fbf8ee;">How concentrated is each crop?</h3>
+          <div class="compare-chart" id="conc-compare"></div>
+        </div>
+      </div>
+
+      <div class="takeaway-grid">
+        <div class="takeaway reveal">
+          <span class="eyebrow">Two staple rices, opposite logics</span>
+          <h4>Boro &amp; Aman anchor the calendar</h4>
+          <p>Together Boro and Aman occupy land across nearly every district. Boro concentrates where groundwater irrigation exists — area and yield align in the same northwestern districts. Aman is the opposite: Bangladesh's most evenly spread crop, grown out of agro-ecological necessity wherever monsoon flooding or dry-season salinity leave no other option.</p>
+        </div>
+        <div class="takeaway reveal">
+          <span class="eyebrow">Aus, the marginal season</span>
+          <h4>A rainfed crop in retreat</h4>
+          <p>Aus persists mainly in the rainfed lowlands of Barisal, squeezed everywhere else by the Boro&ndash;Aman rotation. It is the most spatially restricted rice season nationally, with over half of all districts recording negligible area or land share.</p>
+        </div>
+        <div class="takeaway reveal">
+          <span class="eyebrow">Three crops, one belt</span>
+          <h4>Wheat, Maize &amp; Potato share an address</h4>
+          <p>All three are climatically gated to the cool, dry winters and well-drained alluvial soils of Rajshahi and Rangpur. Maize and Potato share an almost identical concentration signature: 85&ndash;87% of districts negligible, with zero districts in the "High" percentage-area class &mdash; an abrupt jump from moderate to dominant, with no transition zone.</p>
+        </div>
+        <div class="takeaway reveal">
+          <span class="eyebrow">The recurring periphery</span>
+          <h4>Sylhet, Chittagong &amp; coastal Barisal</h4>
+          <p>Across all six crops, the same districts recur at the low end &mdash; not from weak management but from haor flooding, hill terrain, and tidal salinity. These structural constraints, persistent across every map in this study, point toward the need for regionally differentiated agricultural strategy rather than a single national prescription.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <div class="brand">CEGIS &middot; RDT Division</div>
+      <p>Centre for Environmental and Geographic Information Services, Agricultural &amp; Fisheries Division. Exercise 02 — district-level thematic mapping of crop yield, area, and land use across Bangladesh.</p>
+    </div>
+    <div>
+      <h5>Data &amp; Tools</h5>
+      <ul>
+        <li>Statistics &mdash; Bangladesh Bureau of Statistics</li>
+        <li>Mapping &amp; symbology &mdash; ArcGIS Pro</li>
+        <li>Charts &mdash; Python, Matplotlib &amp; Seaborn</li>
+        <li>Projection &mdash; BTM, GCS Everest 1830</li>
+      </ul>
+    </div>
+    <div>
+      <h5>Crops covered</h5>
+      <ul>
+        <li>Boro, Aus &amp; Aman rice</li>
+        <li>Wheat</li>
+        <li>Rabi Maize</li>
+        <li>Potato</li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>64 districts &middot; 6 crops &middot; 18 thematic maps</span>
+    <span>Exercise 02 / Agricultural Thematic Mapping Report</span>
+  </div>
+</footer>
+
+<!-- ============================================================ LIGHTBOX ============================================================ -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Map viewer">
+  <button class="lb-close" id="lb-close" aria-label="Close">&times;</button>
+  <figure>
+    <img id="lb-img" src="" alt="">
+    <figcaption id="lb-cap"></figcaption>
+  </figure>
+</div>
+
+<script>
+/* ============================================================================================
+   DATA — every figure on the page, derived from the Exercise 02 report tables.
+   Each `img:"Name"` value below maps directly to images/Name.png — e.g.
+   img:"Boro_Rice_Yield"  ->  images/Boro_Rice_Yield.png
+   These are exactly the filenames listed in the upload checklist at the top of this file.
+   ============================================================================================ */
+const RAMP = ["ramp-1","ramp-2","ramp-3","ramp-4","ramp-5"]; // very low -> very high
+const RAMP_LABELS = ["Very Low","Low","Medium","High","Very High"];
+
+const CROPS = [
+  {
+    id:"boro", name:"Boro Rice", color:"#1f6f50", deep:"#134a35",
+    tag:"Rice &middot; Irrigated Dry Season", role:"Bangladesh's most intensively managed rice season — groundwater-fed and concentrated in the alluvial, irrigation-rich northwest.",
+    leads:"Rangpur &amp; Rajshahi", lags:"Sylhet, Chittagong &amp; Barisal", pattern:"Area, land-share and yield all align in the same districts &mdash; a rare case of geographic and productive concentration matching.",
+    figures:[
+      {key:"area", title:"Crop Cover Area", unit:"ha", img:"Boro_Crop_Area", min:"5,627", max:"257,649", mean:"76,215", median:"58,387", sd:"57,991",
+        classes:[["5,627–56,031",28,43.8],["56,031–106,436",19,29.7],["106,436–156,840",8,12.5],["156,840–207,245",7,10.9],["207,245–257,649",2,3.1]]},
+      {key:"pct", title:"% of District Area", unit:"%", img:"Boro_pct", min:"1.28%", max:"72.23%", mean:"35.62%", median:"31.32%", sd:"18.66",
+        classes:[["1.28–15.47%",8,12.5],["15.47–29.66%",22,34.4],["29.66–43.85%",10,15.6],["43.85–58.04%",14,21.9],["58.04–72.23%",10,15.6]]},
+      {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Boro_Rice_Yield", min:"2.38", max:"5.38", mean:"4.25", median:"4.28", sd:"0.45",
+        classes:[["2.38–3.50",4,6.2],["3.50–4.00",8,12.5],["4.00–4.20",14,21.9],["4.20–4.60",29,45.3],["4.60–5.38",9,14.1]]}
+    ],
+    observation:"Rangpur and Rajshahi divisions lead across all three parameters — high area, high land commitment, and above-average yield — driven by irrigation infrastructure and flat alluvial topography. Nationally, Boro yield is more uniformly distributed than its area, indicating that where it is cultivated, it is produced with reasonable efficiency."
+  },
+  {
+    id:"aus", name:"Aus Rice", color:"#0e6e8c", deep:"#0a4f64",
+    tag:"Rice &middot; Rainfed Pre-Monsoon", role:"The marginal rice season — rainfed, lowland, and squeezed by the Boro&ndash;Aman rotation everywhere outside its lowland strongholds.",
+    leads:"Barisal &amp; parts of Dhaka", lags:"Rangpur &amp; Rajshahi", pattern:"Inverse relationship between extent and productivity — districts with very high yield tend to grow Aus selectively, on their best land only.",
+    figures:[
+      {key:"area", title:"Crop Cover Area", unit:"ha", img:"Aus_Crop_Area", min:"222", max:"78,651", mean:"16,168", median:"11,586", sd:"17,144",
+        classes:[["222–15,908",41,64.1],["15,908–31,594",12,18.8],["31,594–47,279",8,12.5],["47,279–62,965",1,1.6],["62,965–78,651",2,3.1]]},
+      {key:"pct", title:"% of District Area", unit:"%", img:"Aus_pct", min:"0.17%", max:"37.25%", mean:"8.30%", median:"5.52%", sd:"8.94",
+        classes:[["0.17–7.59%",38,59.4],["7.59–15.00%",15,23.4],["15.00–22.42%",5,7.8],["22.42–29.84%",3,4.7],["29.84–37.25%",3,4.7]]},
+      {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Aus_Yield", min:"1.73", max:"3.41", mean:"2.76", median:"2.88", sd:"0.41",
+        classes:[["1.73–2.07",6,9.4],["2.07–2.40",9,14.1],["2.40–2.74",22,34.4],["2.74–3.07",19,29.7],["3.07–3.41",8,12.5]]}
+    ],
+    observation:"Aus is the most spatially restricted rice season nationally — over half of all districts record Very Low area and percentage values. Barisal division is the primary cultivation zone, driven by rainfed lowland ecology. Yield is more uniformly distributed than area, though it remains low overall."
+  },
+  {
+    id:"aman", name:"Aman Rice", color:"#8aa63c", deep:"#5d7327",
+    tag:"Rice &middot; Primary Monsoon Season", role:"The most spatially widespread crop in Bangladesh — cultivated across every division as the default monsoon rice.",
+    leads:"Dhaka, Mymensingh &amp; Rangpur (area) &middot; Rajshahi (yield)", lags:"Chittagong Hill Tracts &amp; northern Sylhet", pattern:"Highest-area districts differ from highest-yield districts — grown broadly out of necessity, not concentrated in optimal zones.",
+    figures:[
+      {key:"area", title:"Crop Cover Area", unit:"ha", img:"Aman_Crop_Area", min:"5,670", max:"259,225", mean:"89,855", median:"85,474", sd:"56,197",
+        classes:[["5,670–56,381",19,29.7],["56,381–107,092",25,39.1],["107,092–157,803",11,17.2],["157,803–208,514",7,10.9],["208,514–259,225",2,3.1]]},
+      {key:"pct", title:"% of District Area", unit:"%", img:"Aman_pct", min:"1.67%", max:"86.76%", mean:"43.39%", median:"41.64%", sd:"20.62",
+        classes:[["1.67–18.69%",8,12.5],["18.69–35.71%",17,26.6],["35.71–52.72%",14,21.9],["52.72–69.74%",14,21.9],["69.74–86.76%",11,17.2]]},
+      {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Aman_Yield", min:"1.17", max:"3.45", mean:"2.80", median:"2.97", sd:"0.48",
+        classes:[["1.17–2.00",6,9.4],["2.00–2.50",9,14.1],["2.50–3.00",22,34.4],["3.00–3.20",19,29.7],["3.20–3.46",8,12.5]]}
+    ],
+    observation:"Aman is Bangladesh's most spatially widespread rice season — cultivated across all divisions with no region recording negligible coverage. Barisal and coastal Khulna record the highest land commitment, as Aman is the only agronomically viable season under monsoon flooding and dry-season salinity."
+  },
+  {
+    id:"wheat", name:"Wheat", color:"#d9792f", deep:"#a85a1f", hasZero:true,
+    tag:"Rabi &middot; Winter Cereal", role:"The most geographically restricted crop in this study — climatically excluded from the south and east, not merely under-cultivated there.",
+    leads:"Rajshahi &amp; Rangpur", lags:"Barisal, Chittagong &amp; Sylhet (6 districts at zero production)", pattern:"A binary crop: where winters are cool and dry enough, wheat performs reasonably; everywhere else, it is simply absent.",
+    figures:[
+      {key:"area", title:"Crop Cover Area", unit:"ha", img:"Wheat_Crop_Area", min:"0", max:"42,179", mean:"4,868", median:"911", sd:"8,457",
+        classes:[["0–8,436",53,82.8],["8,436–16,872",4,6.2],["16,872–25,307",4,6.2],["25,307–33,743",2,3.1],["33,743–42,179",1,1.6]]},
+      {key:"pct", title:"% of District Area", unit:"%", img:"wheat_pct", min:"0.00%", max:"23.25%", mean:"2.83%", median:"0.48%", sd:"4.94",
+        classes:[["0.00–4.65%",52,81.2],["4.65–9.30%",3,4.7],["9.30–13.95%",6,9.4],["13.95–18.60%",2,3.1],["18.60–23.25%",1,1.6]]},
+      {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Wheat", min:"0.00", max:"4.54", mean:"2.98", median:"3.22", sd:"1.10", zero:6, zeroPct:9.4,
+        classes:[["0.01–2.50",4,6.2],["2.51–3.00",14,21.9],["3.01–3.50",22,34.4],["3.51–4.00",12,18.8],["4.01–4.60",6,9.4]]}
+    ],
+    observation:"Wheat is the most geographically restricted crop in this study. Cultivation is almost entirely confined to Rajshahi and Rangpur, where cool dry winters provide the only agronomically suitable conditions in Bangladesh. Where wheat is grown, yield performance is reasonable — the constraint is geographic suitability, not agronomic capability."
+  },
+  {
+    id:"maize", name:"Rabi Maize", color:"#e0b03d", deep:"#a87f23",
+    tag:"Rabi &middot; Winter Maize", role:"The most extreme geographic concentration of any crop in this study — one district carries almost the entire national footprint.",
+    leads:"Rangpur (a single dominant district)", lags:"85.9% of districts contribute negligibly", pattern:"An abrupt jump from Medium to Very High with zero districts in between — expansion by displacement, not gradual diffusion.",
+    figures:[
+      {key:"area", title:"Crop Cover Area", unit:"ha", img:"Rabi_Maize_Crop_Area", min:"5", max:"64,609", mean:"6,707", median:"484", sd:"11,917",
+        classes:[["5–12,926",52,81.2],["12,926–25,847",6,9.4],["25,847–38,767",4,6.2],["38,767–51,688",1,1.6],["51,688–64,609",1,1.6]]},
+      {key:"pct", title:"% of District Area", unit:"%", img:"Rabi_Maize_pct", min:"0.00%", max:"41.25%", mean:"3.83%", median:"0.30%", sd:"7.26",
+        classes:[["0.00–8.25%",55,85.9],["8.25–16.50%",3,4.7],["16.50–24.75%",5,7.8],["24.75–33.00%",0,0.0],["33.00–41.25%",1,1.6]]},
+      {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Rabi_Maize_Yield", min:"3.58", max:"16.85", mean:"8.09", median:"8.29", sd:"2.29",
+        classes:[["3.58–5.60",9,14.1],["5.60–7.30",16,25.0],["7.30–8.70",14,21.9],["8.70–10.40",15,23.4],["10.40–16.90",10,15.6]]}
+    ],
+    observation:"Rabi Maize presents the most extreme geographic concentration of any crop in this study. Despite this, maize records the highest yield nationally at 8.09 MT/ha — more than double Boro rice — driven by hybrid-variety adoption and irrigated dry-season conditions in the northwest."
+  },
+  {
+    id:"potato", name:"Potato", color:"#b6472b", deep:"#7d2f1c",
+    tag:"Rabi &middot; Winter Tuber Crop", role:"Mirrors Maize's concentration pattern almost exactly, while delivering the highest absolute yield of any crop measured in this study.",
+    leads:"Rangpur &amp; Rajshahi", lags:"85&ndash;87% of districts contribute negligibly", pattern:"Same abrupt Medium-to-Very-High jump as Maize, with zero districts in the High percentage class — a sharp, not gradual, spatial divide.",
+    figures:[
+      {key:"area", title:"Crop Cover Area", unit:"ha", img:"Potato_Crop_Area", min:"50", max:"53,842", mean:"7,140", median:"1,574", sd:"13,041",
+        classes:[["50–10,808",55,85.9],["10,808–21,567",1,1.6],["21,567–32,325",2,3.1],["32,325–43,084",3,4.7],["43,084–53,842",3,4.7]]},
+      {key:"pct", title:"% of District Area", unit:"%", img:"Potato_pct", min:"0.05%", max:"40.36%", mean:"3.88%", median:"0.73%", sd:"7.84",
+        classes:[["0.05–8.11%",56,87.5],["8.11–16.17%",4,6.2],["16.17–24.23%",2,3.1],["24.23–32.30%",0,0.0],["32.30–40.36%",2,3.1]]},
+      {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Potato_Yield", min:"9.13", max:"30.03", mean:"19.83", median:"20.18", sd:"4.75",
+        classes:[["9.13–14.00",8,12.5],["14.00–19.00",19,29.7],["19.00–22.00",14,21.9],["22.00–25.00",13,20.3],["25.00–30.03",10,15.6]]}
+    ],
+    observation:"Potato cultivation mirrors the concentration pattern of Rabi Maize — 85 to 87% of districts record Very Low values across both area and percentage maps. Despite this narrow geographic footprint, potato records the highest absolute yield nationally at 19.83 MT/ha, reflecting both the crop's inherent productivity and the suitability of northwestern alluvial soils."
+  }
+];
+
+/* ============================================================================================
+   RENDER — build the six crop sections + lightbox registry
+   ============================================================================================ */
+const LIGHTBOX_FIGS = [
+  {img:"Cropping_Intensity", cap:"Cropping Intensity Distribution Map of Bangladesh"} // images/Cropping_Intensity.png
+];
+
+function classBarHTML(fig){
+  const hasZero = fig.zero !== undefined;
+  let segs = "";
+  let legend = "";
+  if(hasZero){
+    segs += `<span class="ramp-0" style="width:${fig.zeroPct}%"></span>`;
+    legend += `<div class="row"><span class="lbl"><span class="sw ramp-0"></span>Zero production</span><b>${fig.zero} (${fig.zeroPct}%)</b></div>`;
+  }
+  fig.classes.forEach((c,i)=>{
+    const [range, count, pct] = c;
+    segs += `<span class="${RAMP[i]}" style="width:${pct}%"></span>`;
+    legend += `<div class="row"><span class="lbl"><span class="sw ${RAMP[i]}"></span>${RAMP_LABELS[i]} &middot; ${range}</span><b>${count} (${pct}%)</b></div>`;
+  });
+  return `<div class="sp-bar">${segs}</div><div class="sp-legend">${legend}</div>`;
+}
+
+// Every figure card's image lives at images/<fig.img>.png — e.g. fig.img "Aman_Yield"
+// resolves to images/Aman_Yield.png. This is the exact filename to upload to GitHub.
+function figureCard(crop, fig, idx){
+  const lbIndex = LIGHTBOX_FIGS.length;
+  LIGHTBOX_FIGS.push({img:fig.img, cap:`${crop.name} — ${fig.title} (${fig.unit})`});
+  return `
+  <div class="figure map-card reveal" data-lightbox="${lbIndex}">
+    <img src="images/${fig.img}.png" alt="${crop.name} ${fig.title} map of Bangladesh by district" loading="lazy">
+    <div class="figcap"><b>${fig.title}</b><span class="zoom-hint">Enlarge</span></div>
+  </div>`;
+}
+
+function statPanel(fig){
+  return `
+  <div class="stat-panel reveal">
+    <div class="sp-head"><h4>${fig.title}</h4><span>${fig.unit}</span></div>
+    <div class="sp-range"><span class="lo">${fig.min}</span><span class="hi">${fig.max}</span></div>
+    <div class="sp-sub"><span>Mean ${fig.mean}</span><span>Median ${fig.median}</span><span>SD ${fig.sd}</span></div>
+    ${classBarHTML(fig)}
+  </div>`;
+}
+
+function renderCropSection(crop){
+  const figuresHTML = crop.figures.map(f=>figureCard(crop,f)).join("");
+  const panelsHTML = crop.figures.map(f=>statPanel(f)).join("");
+  return `
+  <section class="crop-section" id="crop-${crop.id}" style="--accent:${crop.color}">
+    <div class="wrap">
+      <div class="crop-head reveal">
+        <span class="crop-tag" style="background:${crop.color}">${crop.tag}</span>
+      </div>
+      <h2 class="reveal">${crop.name}</h2>
+      <p class="crop-role reveal">${crop.role}</p>
+
+      <div class="map-gallery">${figuresHTML}</div>
+      <div class="stat-panels">${panelsHTML}</div>
+
+      <div class="signature-row">
+        <div class="sig-card lead reveal"><span class="eyebrow" style="color:${crop.deep}">Leads</span><p><b>${crop.leads}</b></p></div>
+        <div class="sig-card lag reveal"><span class="eyebrow" style="color:var(--terracotta)">Lags</span><p><b>${crop.lags}</b></p></div>
+        <div class="sig-card pat reveal"><span class="eyebrow" style="color:var(--river)">Spatial signature</span><p>${crop.pattern}</p></div>
+      </div>
+
+      <div class="observation reveal">
+        <p>${crop.observation}</p>
+        <div class="att">Combined observation &middot; ${crop.name}</div>
+      </div>
+    </div>
+  </section>`;
+}
+
+document.getElementById("crop-sections").innerHTML = CROPS.map(renderCropSection).join("");
+
+/* ============================================================================================
+   SYNTHESIS MINI-CHARTS
+   ============================================================================================ */
+(function(){
+  const yields = [
+    {n:"Boro", v:4.25, c:"#1f6f50"},
+    {n:"Aus", v:2.76, c:"#0e6e8c"},
+    {n:"Aman", v:2.80, c:"#8aa63c"},
+    {n:"Wheat", v:2.98, c:"#d9792f"},
+    {n:"Maize", v:8.09, c:"#e0b03d"},
+    {n:"Potato", v:19.83, c:"#b6472b"}
+  ];
+  const maxY = Math.max(...yields.map(d=>d.v));
+  document.getElementById("yield-compare").innerHTML = yields.map(d=>`
+    <div class="compare-row">
+      <span class="cname" style="color:${d.c}">${d.n}</span>
+      <span class="ctrack"><span class="cfill" style="width:${(d.v/maxY*100).toFixed(1)}%;background:${d.c}"></span></span>
+      <span class="cval">${d.v.toFixed(2)}</span>
+    </div>`).join("");
+
+  const conc = [
+    {n:"Boro", v:43.8, c:"#1f6f50"},
+    {n:"Aus", v:64.1, c:"#0e6e8c"},
+    {n:"Aman", v:29.7, c:"#8aa63c"},
+    {n:"Wheat", v:82.8, c:"#d9792f"},
+    {n:"Maize", v:81.2, c:"#e0b03d"},
+    {n:"Potato", v:85.9, c:"#b6472b"}
+  ];
+  document.getElementById("conc-compare").innerHTML = conc.map(d=>`
+    <div class="compare-row">
+      <span class="cname" style="color:${d.c}">${d.n}</span>
+      <span class="ctrack"><span class="cfill" style="width:${d.v}%;background:${d.c}"></span></span>
+      <span class="cval">${d.v}%</span>
+    </div>`).join("");
+})();
+
+/* ============================================================================================
+   LIGHTBOX
+   ============================================================================================ */
+const lb = document.getElementById("lightbox");
+const lbImg = document.getElementById("lb-img");
+const lbCap = document.getElementById("lb-cap");
+
+function openLightbox(i){
+  const item = LIGHTBOX_FIGS[i];
+  if(!item) return;
+  // images/<item.img>.png — same file used for the inline thumbnail and the lightbox view
+  lbImg.src = `images/${item.img}.png`;
+  lbImg.alt = item.cap;
+  lbCap.innerHTML = `${item.cap} &nbsp;&middot;&nbsp; <a class="lb-down" href="images/${item.img}.png" download>Download image</a>`;
+  lb.classList.add("open");
+}
+document.addEventListener("click", (e)=>{
+  const card = e.target.closest("[data-lightbox]");
+  if(card){ openLightbox(parseInt(card.getAttribute("data-lightbox"),10)); }
+});
+document.getElementById("lb-close").addEventListener("click", ()=> lb.classList.remove("open"));
+lb.addEventListener("click", (e)=>{ if(e.target === lb) lb.classList.remove("open"); });
+document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") lb.classList.remove("open"); });
+
+/* ============================================================================================
+   SCROLLSPY + PROGRESS BAR
+   ============================================================================================ */
+const navLinks = Array.from(document.querySelectorAll("#nav-links a"));
+const sections = navLinks.map(a => document.querySelector(a.getAttribute("href"))).filter(Boolean);
+
+/* ============================================================================================
+   REVEAL ON SCROLL — driven directly off the scroll position (no IntersectionObserver
+   dependency), so nothing can be left stranded at opacity:0 regardless of scroll speed,
+   image-decode load, or reduced-motion settings.
+   ============================================================================================ */
+let revealEls = Array.from(document.querySelectorAll(".reveal"));
+function checkReveals(){
+  if(!revealEls.length) return;
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  /* Reveal anything the scroll position has reached or already passed — not just
+     elements currently overlapping the viewport. This way a fast flick, an anchor
+     jump, or pressing End can never permanently strand a section at opacity:0;
+     only content still fully below the fold stays pending. */
+  revealEls = revealEls.filter(el=>{
+    const r = el.getBoundingClientRect();
+    if(r.top < vh - 40){
+      el.classList.add("in");
+      return false;
+    }
+    return true;
+  });
+}
+
+function onScroll(){
+  const doc = document.documentElement;
+  const denom = (doc.scrollHeight - doc.clientHeight) || 1;
+  const pct = (doc.scrollTop) / denom * 100;
+  document.getElementById("progress-bar").style.width = pct + "%";
+
+  let activeIdx = 0;
+  sections.forEach((sec,i)=>{
+    if(sec.getBoundingClientRect().top <= 120) activeIdx = i;
+  });
+  navLinks.forEach((a,i)=> a.classList.toggle("active", i===activeIdx));
+
+  checkReveals();
+}
+let scrollIdleTimer = null;
+document.addEventListener("scroll", ()=>{
+  clearTimeout(scrollIdleTimer);
+  scrollIdleTimer = setTimeout(checkReveals, 180);
+}, {passive:true});
+document.addEventListener("scrollend", checkReveals);
+document.addEventListener("scroll", onScroll, {passive:true});
+window.addEventListener("resize", checkReveals);
+window.addEventListener("load", checkReveals);
+onScroll();
+/* Belt-and-suspenders backstop: a cheap periodic re-check that guarantees the
+   reveal state always catches up to the true scroll position, no matter how few
+   discrete 'scroll' events a given jump/animation produced. Once every pending
+   element is revealed the array is empty and this becomes a no-op. */
+const revealBackstop = setInterval(()=>{
+  checkReveals();
+  if(!revealEls.length) clearInterval(revealBackstop);
+}, 700);
+</script>
+</body>
+</html>
