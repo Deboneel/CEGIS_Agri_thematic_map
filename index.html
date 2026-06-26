@@ -480,7 +480,7 @@ section.block.tight{ padding-top:52px; }
   position:relative; border-radius:2px;
 }
 .observation::before{
-  content:"“"; font-family:var(--serif); font-size:3.6rem; color:var(--gold);
+  content:"\201C"; font-family:var(--serif); font-size:3.6rem; color:var(--gold);
   position:absolute; top:-6px; left:18px; opacity:0.85; line-height:1;
 }
 .observation p{ position:relative; z-index:1; font-size:0.98rem; color:#e6e9e1; line-height:1.7; padding-left:8px; }
@@ -510,8 +510,9 @@ section.block.tight{ padding-top:52px; }
    FOOTER
    ============================================================ */
 footer{ background:var(--ink); color:#cfd6cc; padding:54px 0 34px; }
-.foot-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:36px; }
-@media (max-width:760px){ .foot-grid{ grid-template-columns:1fr; gap:28px; } }
+.foot-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1.2fr; gap:36px; }
+@media (max-width:1024px){ .foot-grid{ grid-template-columns:1fr 1fr; gap:28px; } }
+@media (max-width:640px){ .foot-grid{ grid-template-columns:1fr; gap:28px; } }
 footer h5{ font-family:var(--mono); font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:#9fd3b4; margin-bottom:14px; }
 footer p, footer li{ font-size:0.86rem; line-height:1.7; color:#cfd6cc; }
 footer ul{ list-style:none; margin:0; padding:0; }
@@ -595,7 +596,7 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
   <div class="hero-inner">
     <div class="hero-eyebrow"><span class="line"></span> Exercise 02 &middot; District-Level Agricultural Mapping</div>
     <h1>Mapping the<br><em>Harvest</em> of Bangladesh</h1>
-    <p class="hero-sub">Eighteen thematic maps, six major crops, sixty-four districts. A spatial reading of <strong>yield</strong>, <strong>cultivated area</strong>, and <strong>land commitment</strong> — built in ArcGIS&nbsp;Pro from boundary and crop-statistics data supplied by BBS, for the Research &amp; Development of Technology Division at CEGIS.</p>
+    <p class="hero-sub">Eighteen thematic maps, six major crops, sixty-four districts. A spatial reading of <strong>yield</strong>, <strong>cultivated area</strong>, and <strong>land commitment</strong> &mdash; built in ArcGIS&nbsp;Pro from boundary and crop-statistics data supplied by BBS, for the Research &amp; Development of Technology Division at CEGIS.</p>
   </div>
 
   <div class="hero-stats">
@@ -618,26 +619,26 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
       <div class="section-head reveal">
         <span class="eyebrow">01 &middot; Reading the maps</span>
         <h2>Three lenses on every crop</h2>
-        <p>Bangladesh's 64 districts were processed through a shared pipeline: crop production and harvested-area figures from BBS, joined by <span class="mono">DISTCODE</span> to a district boundary shapefile, projected in <strong>Bangladesh Transverse Mercator</strong>. Each crop is read through three complementary parameters — no single one tells the whole story.</p>
+        <p>Bangladesh's 64 districts were processed through a shared pipeline: crop production and harvested-area figures from BBS, joined by <span class="mono">DISTCODE</span> to a district boundary shapefile, projected in <strong>Bangladesh Transverse Mercator</strong>. Each crop is read through three complementary parameters &mdash; no single one tells the whole story.</p>
       </div>
 
       <div class="param-trio reveal">
         <div class="param-card">
           <div class="pc-icon">Y</div>
           <h4>Crop Yield</h4>
-          <p>How productively land is being used — independent of farm scale. A district can cultivate widely yet yield poorly, or farm a small area with excellent output.</p>
+          <p>How productively land is being used &mdash; independent of farm scale. A district can cultivate widely yet yield poorly, or farm a small area with excellent output.</p>
           <div class="formula">MT/ha = Production (MT) &divide; Harvested Area (ha)</div>
         </div>
         <div class="param-card">
           <div class="pc-icon">A</div>
           <h4>Crop Area</h4>
-          <p>The absolute extent under cultivation, in hectares. This is the production geography — which districts anchor national supply by sheer scale.</p>
+          <p>The absolute extent under cultivation, in hectares. This is the production geography &mdash; which districts anchor national supply by sheer scale.</p>
           <div class="formula">Sourced directly from BBS crop statistics</div>
         </div>
         <div class="param-card">
           <div class="pc-icon">%</div>
           <h4>% of District Area</h4>
-          <p>Crop area normalised against total district size — revealing genuine land specialisation rather than an artefact of a district simply being large.</p>
+          <p>Crop area normalised against total district size &mdash; revealing genuine land specialisation rather than an artefact of a district simply being large.</p>
           <div class="formula">% = (Crop Area &divide; Total District Area) &times; 100</div>
         </div>
       </div>
@@ -684,15 +685,19 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
     <div class="wrap">
       <div class="section-head reveal">
         <span class="eyebrow">02 &middot; Setting the baseline</span>
-        <h2>Cropping Intensity — the land's calendar</h2>
+        <h2>Cropping Intensity &mdash; the land's calendar</h2>
         <p>Before reading any single crop, intensity sets the context: how many times a hectare is cultivated within one year. 100% is single cropping, 200% is double, and anything beyond reflects triple or mixed systems stacked onto the same land.</p>
       </div>
 
       <div class="intensity-layout">
         <div class="reveal">
           <div class="figure" data-lightbox="0">
-            <!-- upload as: images/Cropping_Intensity.png -->
-            <img src="images/Cropping_Intensity.png" alt="Cropping Intensity Distribution Map of Bangladesh, choropleth by district with histogram and donut breakdown" loading="lazy">
+            <!-- ✅ FIXED: was src="Cropping_Intensity.png" (wrong — root level)
+                 Now correctly points to images/Cropping_Intensity.png -->
+            <img src="images/Cropping_Intensity.png"
+                 alt="Cropping Intensity Distribution Map of Bangladesh, choropleth by district with histogram and donut breakdown"
+                 loading="lazy"
+                 decoding="async">
             <div class="figcap"><span>Fig. 00 &middot; Cropping Intensity Distribution</span><span class="zoom-hint">Click to enlarge</span></div>
           </div>
 
@@ -725,7 +730,7 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
         <div class="side-card reveal">
           <span class="eyebrow">Why it varies</span>
           <h3>One nation, two cropping worlds</h3>
-          <p>The 198% mean balances a productive northern belt consistently exceeding 215% against a structurally constrained southern and eastern periphery falling below 165% — not a uniform national condition.</p>
+          <p>The 198% mean balances a productive northern belt consistently exceeding 215% against a structurally constrained southern and eastern periphery falling below 165% &mdash; not a uniform national condition.</p>
           <table>
             <tr><th>Factor</th><th>High intensity</th><th>Low intensity</th></tr>
             <tr><td>Irrigation</td><td>Tubewell-fed Barind Tract enables dry-season Boro</td><td>No infrastructure &mdash; limited to one crop</td></tr>
@@ -746,7 +751,7 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
       <div class="section-head reveal">
         <span class="eyebrow">09 &middot; Putting it together</span>
         <h2>The same map, six times over</h2>
-        <p>Read side by side, the eighteen maps describe one recurring geography: an irrigated, alluvial northwest that leads on nearly every parameter, and a hydrologically constrained south and east that consistently trails — not from poor management, but from terrain, salinity, and the monsoon itself.</p>
+        <p>Read side by side, the eighteen maps describe one recurring geography: an irrigated, alluvial northwest that leads on nearly every parameter, and a hydrologically constrained south and east that consistently trails &mdash; not from poor management, but from terrain, salinity, and the monsoon itself.</p>
       </div>
 
       <div class="spec-grid" style="grid-template-columns:1fr 1fr;">
@@ -766,7 +771,7 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
         <div class="takeaway reveal">
           <span class="eyebrow">Two staple rices, opposite logics</span>
           <h4>Boro &amp; Aman anchor the calendar</h4>
-          <p>Together Boro and Aman occupy land across nearly every district. Boro concentrates where groundwater irrigation exists — area and yield align in the same northwestern districts. Aman is the opposite: Bangladesh's most evenly spread crop, grown out of agro-ecological necessity wherever monsoon flooding or dry-season salinity leave no other option.</p>
+          <p>Together Boro and Aman occupy land across nearly every district. Boro concentrates where groundwater irrigation exists &mdash; area and yield align in the same northwestern districts. Aman is the opposite: Bangladesh's most evenly spread crop, grown out of agro-ecological necessity wherever monsoon flooding or dry-season salinity leave no other option.</p>
         </div>
         <div class="takeaway reveal">
           <span class="eyebrow">Aus, the marginal season</span>
@@ -776,7 +781,7 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
         <div class="takeaway reveal">
           <span class="eyebrow">Three crops, one belt</span>
           <h4>Wheat, Maize &amp; Potato share an address</h4>
-          <p>All three are climatically gated to the cool, dry winters and well-drained alluvial soils of Rajshahi and Rangpur. Maize and Potato share an almost identical concentration signature: 85&ndash;87% of districts negligible, with zero districts in the "High" percentage-area class &mdash; an abrupt jump from moderate to dominant, with no transition zone.</p>
+          <p>All three are climatically gated to the cool, dry winters and well-drained alluvial soils of Rajshahi and Rangpur. Maize and Potato share an almost identical concentration signature: 85&ndash;87% of districts negligible, with zero districts in the &ldquo;High&rdquo; percentage-area class &mdash; an abrupt jump from moderate to dominant, with no transition zone.</p>
         </div>
         <div class="takeaway reveal">
           <span class="eyebrow">The recurring periphery</span>
@@ -790,10 +795,17 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
 </main>
 
 <footer>
-  <div class="wrap foot-grid">
+  <div class="wrap foot-grid" style="grid-template-columns:1.4fr 1fr 1fr 1.2fr;">
     <div>
       <div class="brand">CEGIS &middot; RDT Division</div>
-      <p>Centre for Environmental and Geographic Information Services, Agricultural &amp; Fisheries Division. Exercise 02 — district-level thematic mapping of crop yield, area, and land use across Bangladesh.</p>
+      <p>Centre for Environmental and Geographic Information Services, Agricultural &amp; Fisheries Division. Exercise 02 &mdash; district-level thematic mapping of crop yield, area, and land use across Bangladesh.</p>
+      <p style="margin-top:14px; font-size:0.82rem; color:#9fd3b4;">
+        <strong style="display:block; color:#fbf8ee; margin-bottom:4px;">Supervised by</strong>
+        Mohammad Abdur Rashid<br>
+        Principal Specialist, Director (In-Charge)<br>
+        Agricultural &amp; Fisheries Division, CEGIS<br>
+        <a href="mailto:arashid@cegisbd.com" style="color:#9fd3b4; text-decoration:none;">arashid@cegisbd.com</a>
+      </p>
     </div>
     <div>
       <h5>Data &amp; Tools</h5>
@@ -811,6 +823,22 @@ footer .brand{ font-family:var(--serif); font-size:1.3rem; color:#fbf8ee; margin
         <li>Wheat</li>
         <li>Rabi Maize</li>
         <li>Potato</li>
+      </ul>
+    </div>
+    <div>
+      <h5>Prepared by</h5>
+      <p style="margin:0; color:#fbf8ee; font-size:0.92rem; font-weight:600;">Deboneel Kundu Partho</p>
+      <p style="margin:6px 0 0; font-size:0.82rem; line-height:1.8; color:#cfd6cc;">
+        Dept. of Irrigation and Water Management<br>
+        Faculty of Agricultural Engineering &amp; Technology<br>
+        Bangladesh Agricultural University<br>
+        Mymensingh-2202, Bangladesh
+      </p>
+      <ul style="margin-top:12px; list-style:none; padding:0; font-size:0.82rem; line-height:2;">
+        <li>&#128222; <a href="tel:+8801782449070" style="color:#9fd3b4; text-decoration:none;">+880 1782-449070</a></li>
+        <li>&#9993; <a href="mailto:partho.2105056@bau.edu.bd" style="color:#9fd3b4; text-decoration:none;">partho.2105056@bau.edu.bd</a></li>
+        <li>&#9993; <a href="mailto:deboneel1998@gmail.com" style="color:#9fd3b4; text-decoration:none;">deboneel1998@gmail.com</a></li>
+        <li>&#128279; <a href="https://linkedin.com/in/deboneelpartho" target="_blank" rel="noopener" style="color:#9fd3b4; text-decoration:none;">linkedin.com/in/deboneelpartho</a></li>
       </ul>
     </div>
   </div>
@@ -842,95 +870,96 @@ const RAMP_LABELS = ["Very Low","Low","Medium","High","Very High"];
 const CROPS = [
   {
     id:"boro", name:"Boro Rice", color:"#1f6f50", deep:"#134a35",
-    tag:"Rice &middot; Irrigated Dry Season", role:"Bangladesh's most intensively managed rice season — groundwater-fed and concentrated in the alluvial, irrigation-rich northwest.",
-    leads:"Rangpur &amp; Rajshahi", lags:"Sylhet, Chittagong &amp; Barisal", pattern:"Area, land-share and yield all align in the same districts &mdash; a rare case of geographic and productive concentration matching.",
+    tag:"Rice \u00b7 Irrigated Dry Season", role:"Bangladesh\u2019s most intensively managed rice season \u2014 groundwater-fed and concentrated in the alluvial, irrigation-rich northwest.",
+    leads:"Rangpur &amp; Rajshahi", lags:"Sylhet, Chittagong &amp; Barisal", pattern:"Area, land-share and yield all align in the same districts \u2014 a rare case of geographic and productive concentration matching.",
     figures:[
       {key:"area", title:"Crop Cover Area", unit:"ha", img:"Boro_Crop_Area", min:"5,627", max:"257,649", mean:"76,215", median:"58,387", sd:"57,991",
-        classes:[["5,627–56,031",28,43.8],["56,031–106,436",19,29.7],["106,436–156,840",8,12.5],["156,840–207,245",7,10.9],["207,245–257,649",2,3.1]]},
+        classes:[["5,627\u201356,031",28,43.8],["56,031\u2013106,436",19,29.7],["106,436\u2013156,840",8,12.5],["156,840\u2013207,245",7,10.9],["207,245\u2013257,649",2,3.1]]},
       {key:"pct", title:"% of District Area", unit:"%", img:"Boro_pct", min:"1.28%", max:"72.23%", mean:"35.62%", median:"31.32%", sd:"18.66",
-        classes:[["1.28–15.47%",8,12.5],["15.47–29.66%",22,34.4],["29.66–43.85%",10,15.6],["43.85–58.04%",14,21.9],["58.04–72.23%",10,15.6]]},
+        classes:[["1.28\u201315.47%",8,12.5],["15.47\u201329.66%",22,34.4],["29.66\u201343.85%",10,15.6],["43.85\u201358.04%",14,21.9],["58.04\u201372.23%",10,15.6]]},
       {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Boro_Rice_Yield", min:"2.38", max:"5.38", mean:"4.25", median:"4.28", sd:"0.45",
-        classes:[["2.38–3.50",4,6.2],["3.50–4.00",8,12.5],["4.00–4.20",14,21.9],["4.20–4.60",29,45.3],["4.60–5.38",9,14.1]]}
+        classes:[["2.38\u20133.50",4,6.2],["3.50\u20134.00",8,12.5],["4.00\u20134.20",14,21.9],["4.20\u20134.60",29,45.3],["4.60\u20135.38",9,14.1]]}
     ],
-    observation:"Rangpur and Rajshahi divisions lead across all three parameters — high area, high land commitment, and above-average yield — driven by irrigation infrastructure and flat alluvial topography. Nationally, Boro yield is more uniformly distributed than its area, indicating that where it is cultivated, it is produced with reasonable efficiency."
+    observation:"Rangpur and Rajshahi divisions lead across all three parameters \u2014 high area, high land commitment, and above-average yield \u2014 driven by irrigation infrastructure and flat alluvial topography. Nationally, Boro yield is more uniformly distributed than its area, indicating that where it is cultivated, it is produced with reasonable efficiency."
   },
   {
     id:"aus", name:"Aus Rice", color:"#0e6e8c", deep:"#0a4f64",
-    tag:"Rice &middot; Rainfed Pre-Monsoon", role:"The marginal rice season — rainfed, lowland, and squeezed by the Boro&ndash;Aman rotation everywhere outside its lowland strongholds.",
-    leads:"Barisal &amp; parts of Dhaka", lags:"Rangpur &amp; Rajshahi", pattern:"Inverse relationship between extent and productivity — districts with very high yield tend to grow Aus selectively, on their best land only.",
+    tag:"Rice \u00b7 Rainfed Pre-Monsoon", role:"The marginal rice season \u2014 rainfed, lowland, and squeezed by the Boro\u2013Aman rotation everywhere outside its lowland strongholds.",
+    leads:"Barisal &amp; parts of Dhaka", lags:"Rangpur &amp; Rajshahi", pattern:"Inverse relationship between extent and productivity \u2014 districts with very high yield tend to grow Aus selectively, on their best land only.",
     figures:[
       {key:"area", title:"Crop Cover Area", unit:"ha", img:"Aus_Crop_Area", min:"222", max:"78,651", mean:"16,168", median:"11,586", sd:"17,144",
-        classes:[["222–15,908",41,64.1],["15,908–31,594",12,18.8],["31,594–47,279",8,12.5],["47,279–62,965",1,1.6],["62,965–78,651",2,3.1]]},
+        classes:[["222\u201315,908",41,64.1],["15,908\u201331,594",12,18.8],["31,594\u201347,279",8,12.5],["47,279\u201362,965",1,1.6],["62,965\u201378,651",2,3.1]]},
       {key:"pct", title:"% of District Area", unit:"%", img:"Aus_pct", min:"0.17%", max:"37.25%", mean:"8.30%", median:"5.52%", sd:"8.94",
-        classes:[["0.17–7.59%",38,59.4],["7.59–15.00%",15,23.4],["15.00–22.42%",5,7.8],["22.42–29.84%",3,4.7],["29.84–37.25%",3,4.7]]},
+        classes:[["0.17\u20137.59%",38,59.4],["7.59\u201315.00%",15,23.4],["15.00\u201322.42%",5,7.8],["22.42\u201329.84%",3,4.7],["29.84\u201337.25%",3,4.7]]},
       {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Aus_Yield", min:"1.73", max:"3.41", mean:"2.76", median:"2.88", sd:"0.41",
-        classes:[["1.73–2.07",6,9.4],["2.07–2.40",9,14.1],["2.40–2.74",22,34.4],["2.74–3.07",19,29.7],["3.07–3.41",8,12.5]]}
+        classes:[["1.73\u20132.07",6,9.4],["2.07\u20132.40",9,14.1],["2.40\u20132.74",22,34.4],["2.74\u20133.07",19,29.7],["3.07\u20133.41",8,12.5]]}
     ],
-    observation:"Aus is the most spatially restricted rice season nationally — over half of all districts record Very Low area and percentage values. Barisal division is the primary cultivation zone, driven by rainfed lowland ecology. Yield is more uniformly distributed than area, though it remains low overall."
+    observation:"Aus is the most spatially restricted rice season nationally \u2014 over half of all districts record Very Low area and percentage values. Barisal division is the primary cultivation zone, driven by rainfed lowland ecology. Yield is more uniformly distributed than area, though it remains low overall."
   },
   {
     id:"aman", name:"Aman Rice", color:"#8aa63c", deep:"#5d7327",
-    tag:"Rice &middot; Primary Monsoon Season", role:"The most spatially widespread crop in Bangladesh — cultivated across every division as the default monsoon rice.",
-    leads:"Dhaka, Mymensingh &amp; Rangpur (area) &middot; Rajshahi (yield)", lags:"Chittagong Hill Tracts &amp; northern Sylhet", pattern:"Highest-area districts differ from highest-yield districts — grown broadly out of necessity, not concentrated in optimal zones.",
+    tag:"Rice \u00b7 Primary Monsoon Season", role:"The most spatially widespread crop in Bangladesh \u2014 cultivated across every division as the default monsoon rice.",
+    leads:"Dhaka, Mymensingh &amp; Rangpur (area) \u00b7 Rajshahi (yield)", lags:"Chittagong Hill Tracts &amp; northern Sylhet", pattern:"Highest-area districts differ from highest-yield districts \u2014 grown broadly out of necessity, not concentrated in optimal zones.",
     figures:[
       {key:"area", title:"Crop Cover Area", unit:"ha", img:"Aman_Crop_Area", min:"5,670", max:"259,225", mean:"89,855", median:"85,474", sd:"56,197",
-        classes:[["5,670–56,381",19,29.7],["56,381–107,092",25,39.1],["107,092–157,803",11,17.2],["157,803–208,514",7,10.9],["208,514–259,225",2,3.1]]},
+        classes:[["5,670\u201356,381",19,29.7],["56,381\u2013107,092",25,39.1],["107,092\u2013157,803",11,17.2],["157,803\u2013208,514",7,10.9],["208,514\u2013259,225",2,3.1]]},
       {key:"pct", title:"% of District Area", unit:"%", img:"Aman_pct", min:"1.67%", max:"86.76%", mean:"43.39%", median:"41.64%", sd:"20.62",
-        classes:[["1.67–18.69%",8,12.5],["18.69–35.71%",17,26.6],["35.71–52.72%",14,21.9],["52.72–69.74%",14,21.9],["69.74–86.76%",11,17.2]]},
+        classes:[["1.67\u201318.69%",8,12.5],["18.69\u201335.71%",17,26.6],["35.71\u201352.72%",14,21.9],["52.72\u201369.74%",14,21.9],["69.74\u201386.76%",11,17.2]]},
       {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Aman_Yield", min:"1.17", max:"3.45", mean:"2.80", median:"2.97", sd:"0.48",
-        classes:[["1.17–2.00",6,9.4],["2.00–2.50",9,14.1],["2.50–3.00",22,34.4],["3.00–3.20",19,29.7],["3.20–3.46",8,12.5]]}
+        classes:[["1.17\u20132.00",6,9.4],["2.00\u20132.50",9,14.1],["2.50\u20133.00",22,34.4],["3.00\u20133.20",19,29.7],["3.20\u20133.46",8,12.5]]}
     ],
-    observation:"Aman is Bangladesh's most spatially widespread rice season — cultivated across all divisions with no region recording negligible coverage. Barisal and coastal Khulna record the highest land commitment, as Aman is the only agronomically viable season under monsoon flooding and dry-season salinity."
+    observation:"Aman is Bangladesh\u2019s most spatially widespread rice season \u2014 cultivated across all divisions with no region recording negligible coverage. Barisal and coastal Khulna record the highest land commitment, as Aman is the only agronomically viable season under monsoon flooding and dry-season salinity."
   },
   {
     id:"wheat", name:"Wheat", color:"#d9792f", deep:"#a85a1f", hasZero:true,
-    tag:"Rabi &middot; Winter Cereal", role:"The most geographically restricted crop in this study — climatically excluded from the south and east, not merely under-cultivated there.",
+    tag:"Rabi \u00b7 Winter Cereal", role:"The most geographically restricted crop in this study \u2014 climatically excluded from the south and east, not merely under-cultivated there.",
     leads:"Rajshahi &amp; Rangpur", lags:"Barisal, Chittagong &amp; Sylhet (6 districts at zero production)", pattern:"A binary crop: where winters are cool and dry enough, wheat performs reasonably; everywhere else, it is simply absent.",
     figures:[
       {key:"area", title:"Crop Cover Area", unit:"ha", img:"Wheat_Crop_Area", min:"0", max:"42,179", mean:"4,868", median:"911", sd:"8,457",
-        classes:[["0–8,436",53,82.8],["8,436–16,872",4,6.2],["16,872–25,307",4,6.2],["25,307–33,743",2,3.1],["33,743–42,179",1,1.6]]},
+        classes:[["0\u20138,436",53,82.8],["8,436\u201316,872",4,6.2],["16,872\u201325,307",4,6.2],["25,307\u201333,743",2,3.1],["33,743\u201342,179",1,1.6]]},
       {key:"pct", title:"% of District Area", unit:"%", img:"wheat_pct", min:"0.00%", max:"23.25%", mean:"2.83%", median:"0.48%", sd:"4.94",
-        classes:[["0.00–4.65%",52,81.2],["4.65–9.30%",3,4.7],["9.30–13.95%",6,9.4],["13.95–18.60%",2,3.1],["18.60–23.25%",1,1.6]]},
+        classes:[["0.00\u20134.65%",52,81.2],["4.65\u20139.30%",3,4.7],["9.30\u201313.95%",6,9.4],["13.95\u201318.60%",2,3.1],["18.60\u201323.25%",1,1.6]]},
       {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Wheat", min:"0.00", max:"4.54", mean:"2.98", median:"3.22", sd:"1.10", zero:6, zeroPct:9.4,
-        classes:[["0.01–2.50",4,6.2],["2.51–3.00",14,21.9],["3.01–3.50",22,34.4],["3.51–4.00",12,18.8],["4.01–4.60",6,9.4]]}
+        classes:[["0.01\u20132.50",4,6.2],["2.51\u20133.00",14,21.9],["3.01\u20133.50",22,34.4],["3.51\u20134.00",12,18.8],["4.01\u20134.60",6,9.4]]}
     ],
-    observation:"Wheat is the most geographically restricted crop in this study. Cultivation is almost entirely confined to Rajshahi and Rangpur, where cool dry winters provide the only agronomically suitable conditions in Bangladesh. Where wheat is grown, yield performance is reasonable — the constraint is geographic suitability, not agronomic capability."
+    observation:"Wheat is the most geographically restricted crop in this study. Cultivation is almost entirely confined to Rajshahi and Rangpur, where cool dry winters provide the only agronomically suitable conditions in Bangladesh. Where wheat is grown, yield performance is reasonable \u2014 the constraint is geographic suitability, not agronomic capability."
   },
   {
     id:"maize", name:"Rabi Maize", color:"#e0b03d", deep:"#a87f23",
-    tag:"Rabi &middot; Winter Maize", role:"The most extreme geographic concentration of any crop in this study — one district carries almost the entire national footprint.",
-    leads:"Rangpur (a single dominant district)", lags:"85.9% of districts contribute negligibly", pattern:"An abrupt jump from Medium to Very High with zero districts in between — expansion by displacement, not gradual diffusion.",
+    tag:"Rabi \u00b7 Winter Maize", role:"The most extreme geographic concentration of any crop in this study \u2014 one district carries almost the entire national footprint.",
+    leads:"Rangpur (a single dominant district)", lags:"85.9% of districts contribute negligibly", pattern:"An abrupt jump from Medium to Very High with zero districts in between \u2014 expansion by displacement, not gradual diffusion.",
     figures:[
       {key:"area", title:"Crop Cover Area", unit:"ha", img:"Rabi_Maize_Crop_Area", min:"5", max:"64,609", mean:"6,707", median:"484", sd:"11,917",
-        classes:[["5–12,926",52,81.2],["12,926–25,847",6,9.4],["25,847–38,767",4,6.2],["38,767–51,688",1,1.6],["51,688–64,609",1,1.6]]},
+        classes:[["5\u201312,926",52,81.2],["12,926\u201325,847",6,9.4],["25,847\u201338,767",4,6.2],["38,767\u201351,688",1,1.6],["51,688\u201364,609",1,1.6]]},
       {key:"pct", title:"% of District Area", unit:"%", img:"Rabi_Maize_pct", min:"0.00%", max:"41.25%", mean:"3.83%", median:"0.30%", sd:"7.26",
-        classes:[["0.00–8.25%",55,85.9],["8.25–16.50%",3,4.7],["16.50–24.75%",5,7.8],["24.75–33.00%",0,0.0],["33.00–41.25%",1,1.6]]},
+        classes:[["0.00\u20138.25%",55,85.9],["8.25\u201316.50%",3,4.7],["16.50\u201324.75%",5,7.8],["24.75\u201333.00%",0,0.0],["33.00\u201341.25%",1,1.6]]},
       {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Rabi_Maize_Yield", min:"3.58", max:"16.85", mean:"8.09", median:"8.29", sd:"2.29",
-        classes:[["3.58–5.60",9,14.1],["5.60–7.30",16,25.0],["7.30–8.70",14,21.9],["8.70–10.40",15,23.4],["10.40–16.90",10,15.6]]}
+        classes:[["3.58\u20135.60",9,14.1],["5.60\u20137.30",16,25.0],["7.30\u20138.70",14,21.9],["8.70\u201310.40",15,23.4],["10.40\u201316.90",10,15.6]]}
     ],
-    observation:"Rabi Maize presents the most extreme geographic concentration of any crop in this study. Despite this, maize records the highest yield nationally at 8.09 MT/ha — more than double Boro rice — driven by hybrid-variety adoption and irrigated dry-season conditions in the northwest."
+    observation:"Rabi Maize presents the most extreme geographic concentration of any crop in this study. Despite this, maize records the highest yield nationally at 8.09 MT/ha \u2014 more than double Boro rice \u2014 driven by hybrid-variety adoption and irrigated dry-season conditions in the northwest."
   },
   {
     id:"potato", name:"Potato", color:"#b6472b", deep:"#7d2f1c",
-    tag:"Rabi &middot; Winter Tuber Crop", role:"Mirrors Maize's concentration pattern almost exactly, while delivering the highest absolute yield of any crop measured in this study.",
-    leads:"Rangpur &amp; Rajshahi", lags:"85&ndash;87% of districts contribute negligibly", pattern:"Same abrupt Medium-to-Very-High jump as Maize, with zero districts in the High percentage class — a sharp, not gradual, spatial divide.",
+    tag:"Rabi \u00b7 Winter Tuber Crop", role:"Mirrors Maize\u2019s concentration pattern almost exactly, while delivering the highest absolute yield of any crop measured in this study.",
+    leads:"Rangpur &amp; Rajshahi", lags:"85\u201387% of districts contribute negligibly", pattern:"Same abrupt Medium-to-Very-High jump as Maize, with zero districts in the High percentage class \u2014 a sharp, not gradual, spatial divide.",
     figures:[
       {key:"area", title:"Crop Cover Area", unit:"ha", img:"Potato_Crop_Area", min:"50", max:"53,842", mean:"7,140", median:"1,574", sd:"13,041",
-        classes:[["50–10,808",55,85.9],["10,808–21,567",1,1.6],["21,567–32,325",2,3.1],["32,325–43,084",3,4.7],["43,084–53,842",3,4.7]]},
+        classes:[["50\u201310,808",55,85.9],["10,808\u201321,567",1,1.6],["21,567\u201332,325",2,3.1],["32,325\u201343,084",3,4.7],["43,084\u201353,842",3,4.7]]},
       {key:"pct", title:"% of District Area", unit:"%", img:"Potato_pct", min:"0.05%", max:"40.36%", mean:"3.88%", median:"0.73%", sd:"7.84",
-        classes:[["0.05–8.11%",56,87.5],["8.11–16.17%",4,6.2],["16.17–24.23%",2,3.1],["24.23–32.30%",0,0.0],["32.30–40.36%",2,3.1]]},
+        classes:[["0.05\u20138.11%",56,87.5],["8.11\u201316.17%",4,6.2],["16.17\u201324.23%",2,3.1],["24.23\u201332.30%",0,0.0],["32.30\u201340.36%",2,3.1]]},
       {key:"yield", title:"Crop Yield", unit:"MT/ha", img:"Potato_Yield", min:"9.13", max:"30.03", mean:"19.83", median:"20.18", sd:"4.75",
-        classes:[["9.13–14.00",8,12.5],["14.00–19.00",19,29.7],["19.00–22.00",14,21.9],["22.00–25.00",13,20.3],["25.00–30.03",10,15.6]]}
+        classes:[["9.13\u201314.00",8,12.5],["14.00\u201319.00",19,29.7],["19.00\u201322.00",14,21.9],["22.00\u201325.00",13,20.3],["25.00\u201330.03",10,15.6]]}
     ],
-    observation:"Potato cultivation mirrors the concentration pattern of Rabi Maize — 85 to 87% of districts record Very Low values across both area and percentage maps. Despite this narrow geographic footprint, potato records the highest absolute yield nationally at 19.83 MT/ha, reflecting both the crop's inherent productivity and the suitability of northwestern alluvial soils."
+    observation:"Potato cultivation mirrors the concentration pattern of Rabi Maize \u2014 85 to 87% of districts record Very Low values across both area and percentage maps. Despite this narrow geographic footprint, potato records the highest absolute yield nationally at 19.83 MT/ha, reflecting both the crop\u2019s inherent productivity and the suitability of northwestern alluvial soils."
   }
 ];
 
 /* ============================================================================================
    RENDER — build the six crop sections + lightbox registry
    ============================================================================================ */
+// ✅ FIXED: lightbox registry now also correctly uses "images/" prefix for Cropping Intensity
 const LIGHTBOX_FIGS = [
-  {img:"Cropping_Intensity", cap:"Cropping Intensity Distribution Map of Bangladesh"} // images/Cropping_Intensity.png
+  {img:"Cropping_Intensity", cap:"Cropping Intensity Distribution Map of Bangladesh"}
 ];
 
 function classBarHTML(fig){
@@ -949,14 +978,15 @@ function classBarHTML(fig){
   return `<div class="sp-bar">${segs}</div><div class="sp-legend">${legend}</div>`;
 }
 
-// Every figure card's image lives at images/<fig.img>.png — e.g. fig.img "Aman_Yield"
-// resolves to images/Aman_Yield.png. This is the exact filename to upload to GitHub.
-function figureCard(crop, fig, idx){
+function figureCard(crop, fig){
   const lbIndex = LIGHTBOX_FIGS.length;
-  LIGHTBOX_FIGS.push({img:fig.img, cap:`${crop.name} — ${fig.title} (${fig.unit})`});
+  LIGHTBOX_FIGS.push({img:fig.img, cap:`${crop.name} \u2014 ${fig.title} (${fig.unit})`});
   return `
   <div class="figure map-card reveal" data-lightbox="${lbIndex}">
-    <img src="images/${fig.img}.png" alt="${crop.name} ${fig.title} map of Bangladesh by district" loading="lazy">
+    <img src="images/${fig.img}.png"
+         alt="${crop.name} ${fig.title} map of Bangladesh by district"
+         loading="lazy"
+         decoding="async">
     <div class="figcap"><b>${fig.title}</b><span class="zoom-hint">Enlarge</span></div>
   </div>`;
 }
@@ -1048,7 +1078,7 @@ const lbCap = document.getElementById("lb-cap");
 function openLightbox(i){
   const item = LIGHTBOX_FIGS[i];
   if(!item) return;
-  // images/<item.img>.png — same file used for the inline thumbnail and the lightbox view
+  // ✅ All lightbox images correctly served from images/ subfolder
   lbImg.src = `images/${item.img}.png`;
   lbImg.alt = item.cap;
   lbCap.innerHTML = `${item.cap} &nbsp;&middot;&nbsp; <a class="lb-down" href="images/${item.img}.png" download>Download image</a>`;
@@ -1069,18 +1099,12 @@ const navLinks = Array.from(document.querySelectorAll("#nav-links a"));
 const sections = navLinks.map(a => document.querySelector(a.getAttribute("href"))).filter(Boolean);
 
 /* ============================================================================================
-   REVEAL ON SCROLL — driven directly off the scroll position (no IntersectionObserver
-   dependency), so nothing can be left stranded at opacity:0 regardless of scroll speed,
-   image-decode load, or reduced-motion settings.
+   REVEAL ON SCROLL
    ============================================================================================ */
 let revealEls = Array.from(document.querySelectorAll(".reveal"));
 function checkReveals(){
   if(!revealEls.length) return;
   const vh = window.innerHeight || document.documentElement.clientHeight;
-  /* Reveal anything the scroll position has reached or already passed — not just
-     elements currently overlapping the viewport. This way a fast flick, an anchor
-     jump, or pressing End can never permanently strand a section at opacity:0;
-     only content still fully below the fold stays pending. */
   revealEls = revealEls.filter(el=>{
     const r = el.getBoundingClientRect();
     if(r.top < vh - 40){
@@ -1115,10 +1139,6 @@ document.addEventListener("scroll", onScroll, {passive:true});
 window.addEventListener("resize", checkReveals);
 window.addEventListener("load", checkReveals);
 onScroll();
-/* Belt-and-suspenders backstop: a cheap periodic re-check that guarantees the
-   reveal state always catches up to the true scroll position, no matter how few
-   discrete 'scroll' events a given jump/animation produced. Once every pending
-   element is revealed the array is empty and this becomes a no-op. */
 const revealBackstop = setInterval(()=>{
   checkReveals();
   if(!revealEls.length) clearInterval(revealBackstop);
